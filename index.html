@@ -90,6 +90,11 @@
       border-radius:.8rem; text-align:center; font-size:1.1rem; font-weight:800;
     }
     .test-note { padding:.85rem 1rem; color:#7c2d12; background:#fff7ed; border:1px solid #fed7aa; border-radius:.75rem; font-size:.86rem; line-height:1.45; }
+    .test-history { padding:1rem; color:#1e3a8a; background:#eff6ff; border:1px solid #bfdbfe; border-radius:.8rem; }
+    .test-history h3 { margin:0 0 .3rem; font-size:1rem; }
+    .test-history p { margin:0; font-size:.88rem; line-height:1.45; }
+    .test-history h4 { margin:.75rem 0 .25rem; font-size:.82rem; }
+    .test-history ol { margin:.2rem 0 0; padding-left:1.35rem; font-size:.8rem; line-height:1.55; }
     .test-question { position:relative; }
     .test-type { display:inline-block; margin-bottom:.35rem; color:#9a3412; font-size:.72rem; font-weight:800; letter-spacing:.035em; text-transform:uppercase; }
     .test-result { margin-top:.55rem; font-size:.82rem; font-weight:700; }
@@ -347,6 +352,14 @@
         </div>
         <div id="test-score-badge" class="score-badge" aria-live="polite">0 / 20</div>
       </div>
+      <div id="test-history" class="test-history" aria-live="polite">
+        <h3 id="test-welcome-title">Welkom by Toets my...</h3>
+        <p id="test-last-attempt">Jou voltooide pogings sal op hierdie iPad onthou word.</p>
+        <div id="test-history-details" class="hidden">
+          <h4>Jou laaste paar pogings:</h4>
+          <ol id="test-history-list"></ol>
+        </div>
+      </div>
       <div class="test-note">
         Elke vraag tel 2 punte: 1 punt vir die regte lydende-vormstruktuur en 1 punt vir die heeltemal korrekte sin. Ná elke rondte bly vrae onder 2/2 dieselfde; vrae met 2/2 kry nuwe sinne.
       </div>
@@ -420,6 +433,8 @@
       if (currentSection < practiceSectionCount) {
         document.getElementById('prev-btn').disabled = (currentSection === 0);
         document.getElementById('next-btn').classList.toggle('hidden', !completedSections[currentSection]);
+      } else {
+        renderTestHistory();
       }
       updateNavigation();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -548,6 +563,77 @@
         });
       });
     });
+
+    const testHistoryKey = 'gr6-lydende-vorm-test-history-v1';
+    const testHistoryLimit = 5;
+    let testHistoryAvailable = true;
+
+    function loadTestHistory() {
+      try {
+        const saved = JSON.parse(window.localStorage.getItem(testHistoryKey) || '[]');
+        if (!Array.isArray(saved)) return [];
+        return saved
+          .filter(item => item && Number.isInteger(item.score) && item.score >= 0 && item.score <= 20 && !Number.isNaN(Date.parse(item.date)))
+          .slice(0, testHistoryLimit);
+      } catch (error) {
+        testHistoryAvailable = false;
+        return [];
+      }
+    }
+
+    function formatAttemptDate(dateString) {
+      try {
+        return new Intl.DateTimeFormat('af-ZA', {
+          dateStyle:'medium',
+          timeStyle:'short'
+        }).format(new Date(dateString));
+      } catch (error) {
+        return new Date(dateString).toLocaleString();
+      }
+    }
+
+    function renderTestHistory() {
+      const history = loadTestHistory();
+      const title = document.getElementById('test-welcome-title');
+      const lastAttempt = document.getElementById('test-last-attempt');
+      const details = document.getElementById('test-history-details');
+      const list = document.getElementById('test-history-list');
+      list.innerHTML = '';
+
+      if (!testHistoryAvailable) {
+        title.textContent = 'Welkom!';
+        lastAttempt.textContent = 'Hierdie blaaier laat nie plaaslike poginggeskiedenis toe nie.';
+        details.classList.add('hidden');
+        return;
+      }
+
+      if (!history.length) {
+        title.textContent = 'Welkom by Toets my...';
+        lastAttempt.textContent = 'Dit is jou eerste poging op hierdie iPad. Sterkte!';
+        details.classList.add('hidden');
+        return;
+      }
+
+      title.textContent = 'Welkom terug!';
+      lastAttempt.textContent = `Jou laaste poging was op ${formatAttemptDate(history[0].date)} en jy het ${history[0].score}/20 gekry.`;
+      history.forEach(attempt => {
+        const item = document.createElement('li');
+        item.textContent = `${formatAttemptDate(attempt.date)} — ${attempt.score}/20`;
+        list.appendChild(item);
+      });
+      details.classList.remove('hidden');
+    }
+
+    function saveTestAttempt(score) {
+      if (!testHistoryAvailable) return;
+      const history = loadTestHistory();
+      history.unshift({ date:new Date().toISOString(), score });
+      try {
+        window.localStorage.setItem(testHistoryKey, JSON.stringify(history.slice(0, testHistoryLimit)));
+      } catch (error) {
+        testHistoryAvailable = false;
+      }
+    }
 
     const testPools = {
       present: [
@@ -735,6 +821,8 @@
       const title = document.getElementById('test-round-title');
       const message = document.getElementById('test-round-message');
       const nextButton = document.getElementById('test-next-round');
+      saveTestAttempt(score);
+      renderTestHistory();
       title.textContent = `Rondte ${testRound}: ${score} / 20`;
 
       if (score === 20) {
