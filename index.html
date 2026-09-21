@@ -53,6 +53,7 @@
     #section-nav button { white-space:nowrap; color:var(--slate-500); background:var(--slate-100); font-size:.8rem; }
     #section-nav button.active { color:#fff; background:var(--indigo); }
     #section-nav button.completed:not(.active) { color:#047857; background:#d1fae5; }
+    #section-nav #nav-btn-5:not(.active) { color:#9a3412; background:#ffedd5; }
     section h2 { margin:0 0 .75rem; font-size:1.25rem; }
     section > p { margin:.2rem 0 1.25rem; color:var(--slate-500); font-size:.9rem; }
     .q-container { display:grid; gap:1rem; }
@@ -81,12 +82,31 @@
     }
     #prev-btn { color:var(--slate-600); background:#fff; border:1px solid var(--slate-300); }
     #next-btn { color:#fff; background:var(--emerald); }
-    #section-5 { padding:2rem .5rem; text-align:center; }
-    #section-5 > div { display:inline-flex; margin-bottom:.5rem; padding:1rem; color:#059669; background:#d1fae5; border-radius:999px; }
-    #section-5 svg { width:3rem; height:3rem; }
-    #section-5 h2 { color:var(--slate-900); font-size:1.8rem; }
-    #section-5 p { color:var(--slate-600); }
-    #section-5 button { color:#fff; background:var(--indigo); }
+    .test-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+    .test-heading h2 { margin-bottom:.35rem; }
+    .test-heading p { margin:0; color:var(--slate-500); font-size:.9rem; }
+    .score-badge {
+      flex:0 0 auto; min-width:5.4rem; padding:.65rem .8rem; color:#fff; background:#c2410c;
+      border-radius:.8rem; text-align:center; font-size:1.1rem; font-weight:800;
+    }
+    .test-note { padding:.85rem 1rem; color:#7c2d12; background:#fff7ed; border:1px solid #fed7aa; border-radius:.75rem; font-size:.86rem; line-height:1.45; }
+    .test-question { position:relative; }
+    .test-type { display:inline-block; margin-bottom:.35rem; color:#9a3412; font-size:.72rem; font-weight:800; letter-spacing:.035em; text-transform:uppercase; }
+    .test-result { margin-top:.55rem; font-size:.82rem; font-weight:700; }
+    .test-result.full { color:var(--emerald); }
+    .test-result.partial { color:#b45309; }
+    .test-result.zero { color:var(--rose); }
+    .answer-check.marked:disabled { color:#334155; background:#e2e8f0; opacity:1; cursor:default; }
+    #test-round-summary { margin-top:1.25rem; padding:1.1rem; text-align:center; background:#f8fafc; border:1px solid var(--slate-200); border-radius:.85rem; }
+    #test-round-summary h3 { margin:0 0 .35rem; color:var(--slate-900); }
+    #test-round-summary p { margin:0 0 .9rem; color:var(--slate-600); font-size:.9rem; line-height:1.45; }
+    #test-round-summary button { color:#fff; background:#c2410c; }
+    #section-complete { padding:2rem .5rem; text-align:center; }
+    #section-complete > div { display:inline-flex; margin-bottom:.5rem; padding:1rem; color:#059669; background:#d1fae5; border-radius:999px; }
+    #section-complete svg { width:3rem; height:3rem; }
+    #section-complete h2 { color:var(--slate-900); font-size:1.8rem; }
+    #section-complete p { color:var(--slate-600); }
+    #section-complete button { color:#fff; background:var(--indigo); }
     .hidden { display:none !important; }
     .celebration-piece {
       position:fixed; z-index:50; top:-2rem; pointer-events:none; font-size:1.35rem;
@@ -102,6 +122,8 @@
       #action-bar { flex-wrap:wrap; }
       #action-bar button { flex:1 1 8.5rem; }
       #next-btn { order:-1; flex-basis:100% !important; }
+      .test-heading { align-items:stretch; flex-direction:column; }
+      .score-badge { align-self:flex-start; }
     }
     @media (prefers-reduced-motion:reduce) {
       *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
@@ -142,6 +164,7 @@
       <button onclick="goToSection(2)" id="nav-btn-2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200">Afdeling C</button>
       <button onclick="goToSection(3)" id="nav-btn-3" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200">Afdeling D</button>
       <button onclick="goToSection(4)" id="nav-btn-4" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors bg-slate-100 text-slate-500 hover:bg-slate-200">Afdeling E</button>
+      <button onclick="goToSection(5)" id="nav-btn-5" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-colors">Toets my...</button>
     </div>
 
     <!-- Section A -->
@@ -315,8 +338,28 @@
       </div>
     </section>
 
+    <!-- Always-open mixed mastery test -->
+    <section id="section-test" class="hidden space-y-6">
+      <div class="test-heading">
+        <div>
+          <h2>Toets my...</h2>
+          <p>Tien gemengde vrae. Merk elke antwoord wanneer jy gereed is.</p>
+        </div>
+        <div id="test-score-badge" class="score-badge" aria-live="polite">0 / 20</div>
+      </div>
+      <div class="test-note">
+        Elke vraag tel 2 punte: 1 punt vir die regte lydende-vormstruktuur en 1 punt vir die heeltemal korrekte sin. Ná elke rondte bly vrae onder 2/2 dieselfde; vrae met 2/2 kry nuwe sinne.
+      </div>
+      <div id="test-questions" class="q-container" aria-label="Toets my-vrae"></div>
+      <div id="test-round-summary" class="hidden" aria-live="polite">
+        <h3 id="test-round-title"></h3>
+        <p id="test-round-message"></p>
+        <button id="test-next-round" type="button" onclick="nextTestRound()">Volgende rondte</button>
+      </div>
+    </section>
+
     <!-- Completion Screen -->
-    <section id="section-5" class="hidden text-center py-8 space-y-4">
+    <section id="section-complete" class="hidden text-center py-8 space-y-4">
       <div class="inline-flex p-4 bg-emerald-100 rounded-full text-emerald-600 mb-2">
         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
       </div>
@@ -341,34 +384,43 @@
 
   <script>
     let currentSection = 0;
-    const totalSections = 5;
-    const completedSections = Array(totalSections).fill(false);
+    const practiceSectionCount = 5;
+    const testSectionIndex = 5;
+    const navigationSectionCount = 6;
+    const completedSections = Array(practiceSectionCount).fill(false);
 
     function isUnlocked(index) {
+      if (index === testSectionIndex) return true;
       return index === 0 || completedSections[index] || completedSections[index - 1];
     }
 
     function updateNavigation() {
-      for (let i = 0; i < totalSections; i++) {
+      for (let i = 0; i < navigationSectionCount; i++) {
         const button = document.getElementById(`nav-btn-${i}`);
         button.disabled = !isUnlocked(i);
         button.classList.toggle('active', i === currentSection);
-        button.classList.toggle('completed', completedSections[i]);
+        button.classList.toggle('completed', i < practiceSectionCount && completedSections[i]);
         button.setAttribute('aria-current', i === currentSection ? 'step' : 'false');
         button.title = button.disabled ? 'Voltooi eers die vorige afdeling.' : '';
       }
     }
 
+    function getSectionElement(index) {
+      return document.getElementById(index === testSectionIndex ? 'section-test' : `section-${index}`);
+    }
+
     function goToSection(index) {
-      if (index < 0 || index >= totalSections || !isUnlocked(index)) return;
+      if (index < 0 || index >= navigationSectionCount || !isUnlocked(index)) return;
 
       document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
       currentSection = index;
-      document.getElementById(`section-${currentSection}`).classList.remove('hidden');
+      getSectionElement(currentSection).classList.remove('hidden');
       document.getElementById('section-nav').classList.remove('hidden');
-      document.getElementById('action-bar').classList.remove('hidden');
-      document.getElementById('prev-btn').disabled = (currentSection === 0);
-      document.getElementById('next-btn').classList.toggle('hidden', !completedSections[currentSection]);
+      document.getElementById('action-bar').classList.toggle('hidden', currentSection === testSectionIndex);
+      if (currentSection < practiceSectionCount) {
+        document.getElementById('prev-btn').disabled = (currentSection === 0);
+        document.getElementById('next-btn').classList.toggle('hidden', !completedSections[currentSection]);
+      }
       updateNavigation();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -416,21 +468,21 @@
     }
 
     function completeSectionIfReady() {
-      const activeSection = document.getElementById(`section-${currentSection}`);
+      if (currentSection >= practiceSectionCount) return;
+      const activeSection = getSectionElement(currentSection);
       const inputs = Array.from(activeSection.querySelectorAll('input'));
       if (!inputs.length || !inputs.every(input => input.disabled)) return;
 
       completedSections[currentSection] = true;
       updateNavigation();
-      launchCelebration(currentSection === totalSections - 1 ? 34 : 12);
+      launchCelebration(currentSection === practiceSectionCount - 1 ? 34 : 12);
 
-      if (currentSection < totalSections - 1) {
+      if (currentSection < practiceSectionCount - 1) {
         document.getElementById('next-btn').classList.remove('hidden');
       } else {
-        document.getElementById(`section-${currentSection}`).classList.add('hidden');
-        document.getElementById('section-5').classList.remove('hidden');
+        getSectionElement(currentSection).classList.add('hidden');
+        document.getElementById('section-complete').classList.remove('hidden');
         document.getElementById('action-bar').classList.add('hidden');
-        document.getElementById('section-nav').classList.add('hidden');
       }
     }
 
@@ -452,7 +504,7 @@
 
     function resetApp() {
       completedSections.fill(false);
-      document.querySelectorAll('input').forEach(input => {
+      document.querySelectorAll('input[data-ans]').forEach(input => {
         input.value = '';
         input.disabled = false;
         input.classList.remove('correct', 'incorrect');
@@ -461,14 +513,15 @@
         fb.className = 'feedback hidden';
         fb.textContent = '';
       });
-      document.querySelectorAll('.answer-check').forEach(button => {
+      document.querySelectorAll('.answer-check:not(.test-check)').forEach(button => {
         button.disabled = false;
         button.classList.remove('correct');
         button.textContent = 'Merk my';
       });
-      document.getElementById('section-5').classList.add('hidden');
+      document.getElementById('section-complete').classList.add('hidden');
       document.getElementById('section-nav').classList.remove('hidden');
       document.getElementById('action-bar').classList.remove('hidden');
+      resetTest();
       goToSection(0);
     }
 
@@ -496,6 +549,221 @@
       });
     });
 
+    const testPools = {
+      present: [
+        { id:'pr1', type:'present', label:'Teenwoordige tyd', source:'Die meisie lees die boek.', starter:'Die boek ...', answer:'Die boek word deur die meisie gelees.', fragment:'word deur die meisie gelees', structure:['word','deur'] },
+        { id:'pr2', type:'present', label:'Teenwoordige tyd', source:'Oupa verf die hek.', starter:'Die hek ...', answer:'Die hek word deur Oupa geverf.', fragment:'word deur Oupa geverf', structure:['word','deur'] },
+        { id:'pr3', type:'present', label:'Teenwoordige tyd', source:'Mia skryf die brief.', starter:'Die brief ...', answer:'Die brief word deur Mia geskryf.', fragment:'word deur Mia geskryf', structure:['word','deur'] },
+        { id:'pr4', type:'present', label:'Teenwoordige tyd', source:'Die hond jaag die kat.', starter:'Die kat ...', answer:'Die kat word deur die hond gejaag.', fragment:'word deur die hond gejaag', structure:['word','deur'] },
+        { id:'pr5', type:'present', label:'Teenwoordige tyd', source:'Die kok kook die sop.', starter:'Die sop ...', answer:'Die sop word deur die kok gekook.', fragment:'word deur die kok gekook', structure:['word','deur'] }
+      ],
+      past: [
+        { id:'pa1', type:'past', label:'Verlede tyd', source:'Die seuns het die bal geskop.', starter:'Die bal ...', answer:'Die bal is deur die seuns geskop.', fragment:'is deur die seuns geskop', structure:['is','deur'] },
+        { id:'pa2', type:'past', label:'Verlede tyd', source:'Mamma het die koek gebak.', starter:'Die koek ...', answer:'Die koek is deur Mamma gebak.', fragment:'is deur Mamma gebak', structure:['is','deur'] },
+        { id:'pa3', type:'past', label:'Verlede tyd', source:'Liza het die liedjie gesing.', starter:'Die liedjie ...', answer:'Die liedjie is deur Liza gesing.', fragment:'is deur Liza gesing', structure:['is','deur'] },
+        { id:'pa4', type:'past', label:'Verlede tyd', source:'Die onderwyser het die boeke gemerk.', starter:'Die boeke ...', answer:'Die boeke is deur die onderwyser gemerk.', fragment:'is deur die onderwyser gemerk', structure:['is','deur'] },
+        { id:'pa5', type:'past', label:'Verlede tyd', source:'Pieter het die appel geëet.', starter:'Die appel ...', answer:'Die appel is deur Pieter geëet.', fragment:'is deur Pieter geëet', structure:['is','deur'] }
+      ],
+      future: [
+        { id:'fu1', type:'future', label:'Toekomstige tyd', source:'Sara sal die prent teken.', starter:'Die prent ...', answer:'Die prent sal deur Sara geteken word.', fragment:'sal deur Sara geteken word', structure:['sal','deur','word'] },
+        { id:'fu2', type:'future', label:'Toekomstige tyd', source:'Die kinders sal die storie lees.', starter:'Die storie ...', answer:'Die storie sal deur die kinders gelees word.', fragment:'sal deur die kinders gelees word', structure:['sal','deur','word'] },
+        { id:'fu3', type:'future', label:'Toekomstige tyd', source:'Die man sal die motor was.', starter:'Die motor ...', answer:'Die motor sal deur die man gewas word.', fragment:'sal deur die man gewas word', structure:['sal','deur','word'] },
+        { id:'fu4', type:'future', label:'Toekomstige tyd', source:'Mia sal die venster oopmaak.', starter:'Die venster ...', answer:'Die venster sal deur Mia oopgemaak word.', fragment:'sal deur Mia oopgemaak word', structure:['sal','deur','word'] },
+        { id:'fu5', type:'future', label:'Toekomstige tyd', source:'Die span sal die wedstryd wen.', starter:'Die wedstryd ...', answer:'Die wedstryd sal deur die span gewen word.', fragment:'sal deur die span gewen word', structure:['sal','deur','word'] }
+      ],
+      time: [
+        { id:'ti1', type:'time', label:'Bywoord van tyd', source:'Sipho lees vandag die boek.', starter:'Die boek ...', answer:'Die boek word vandag deur Sipho gelees.', fragment:'word vandag deur Sipho gelees', structure:['word','vandag','deur'] },
+        { id:'ti2', type:'time', label:'Bywoord van tyd', source:'Dullah het gister die toets geskryf.', starter:'Die toets ...', answer:'Die toets is gister deur Dullah geskryf.', fragment:'is gister deur Dullah geskryf', structure:['is','gister','deur'] },
+        { id:'ti3', type:'time', label:'Bywoord van tyd', source:'Die vrou sal môre die kos kook.', starter:'Die kos ...', answer:'Die kos sal môre deur die vrou gekook word.', fragment:'sal môre deur die vrou gekook word', structure:['sal','more','deur','word'] },
+        { id:'ti4', type:'time', label:'Bywoord van tyd', source:'Ben maak elke oggend die deur oop.', starter:'Die deur ...', answer:'Die deur word elke oggend deur Ben oopgemaak.', fragment:'word elke oggend deur Ben oopgemaak', structure:['word','elke','oggend','deur'] },
+        { id:'ti5', type:'time', label:'Bywoord van tyd', source:'Die klas het verlede week die projek voltooi.', starter:'Die projek ...', answer:'Die projek is verlede week deur die klas voltooi.', fragment:'is verlede week deur die klas voltooi', structure:['is','verlede','week','deur'] }
+      ],
+      manner: [
+        { id:'ma1', type:'manner', label:'Bywoord van manier', source:'Die meisie sal vinnig die melk drink.', starter:'Die melk ...', answer:'Die melk sal vinnig deur die meisie gedrink word.', fragment:'sal vinnig deur die meisie gedrink word', structure:['sal','vinnig','deur','word'] },
+        { id:'ma2', type:'manner', label:'Bywoord van manier', source:'Cooper lees hardop die storie.', starter:'Die storie ...', answer:'Die storie word hardop deur Cooper gelees.', fragment:'word hardop deur Cooper gelees', structure:['word','hardop','deur'] },
+        { id:'ma3', type:'manner', label:'Bywoord van manier', source:'Die man het versigtig die glas gedra.', starter:'Die glas ...', answer:'Die glas is versigtig deur die man gedra.', fragment:'is versigtig deur die man gedra', structure:['is','versigtig','deur'] },
+        { id:'ma4', type:'manner', label:'Bywoord van manier', source:'Lindiwe maak netjies die bed op.', starter:'Die bed ...', answer:'Die bed word netjies deur Lindiwe opgemaak.', fragment:'word netjies deur Lindiwe opgemaak', structure:['word','netjies','deur'] },
+        { id:'ma5', type:'manner', label:'Bywoord van manier', source:'Die kinders sal stil die werk doen.', starter:'Die werk ...', answer:'Die werk sal stil deur die kinders gedoen word.', fragment:'sal stil deur die kinders gedoen word', structure:['sal','stil','deur','word'] }
+      ],
+      place: [
+        { id:'pl1', type:'place', label:'Bywoord van plek', source:'Ezra skryf die nota in sy boek.', starter:'Die nota ...', answer:'Die nota word deur Ezra in sy boek geskryf.', fragment:'word deur Ezra in sy boek geskryf', structure:['word','deur','in','sy','boek'] },
+        { id:'pl2', type:'place', label:'Bywoord van plek', source:'Die kinders speel die wedstryd op die veld.', starter:'Die wedstryd ...', answer:'Die wedstryd word deur die kinders op die veld gespeel.', fragment:'word deur die kinders op die veld gespeel', structure:['word','deur','op','die','veld'] },
+        { id:'pl3', type:'place', label:'Bywoord van plek', source:'Mamma het die koek in die kombuis gebak.', starter:'Die koek ...', answer:'Die koek is deur Mamma in die kombuis gebak.', fragment:'is deur Mamma in die kombuis gebak', structure:['is','deur','in','die','kombuis'] },
+        { id:'pl4', type:'place', label:'Bywoord van plek', source:'Jan sal die boom in die tuin plant.', starter:'Die boom ...', answer:'Die boom sal deur Jan in die tuin geplant word.', fragment:'sal deur Jan in die tuin geplant word', structure:['sal','deur','in','die','tuin','word'] },
+        { id:'pl5', type:'place', label:'Bywoord van plek', source:'Die leerder lees die boek in die biblioteek.', starter:'Die boek ...', answer:'Die boek word deur die leerder in die biblioteek gelees.', fragment:'word deur die leerder in die biblioteek gelees', structure:['word','deur','in','die','biblioteek'] }
+      ]
+    };
+
+    const testTypePlan = ['present','present','past','past','future','future','time','manner','place','place'];
+    let testQuestions = [];
+    let testScores = Array(10).fill(null);
+    let testLocked = Array(10).fill(false);
+    let testRound = 1;
+
+    function shuffled(items) {
+      const copy = [...items];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function pickTestQuestion(type, previousId = '', usedIds = new Set()) {
+      let choices = testPools[type].filter(question => question.id !== previousId && !usedIds.has(question.id));
+      if (!choices.length) choices = testPools[type].filter(question => !usedIds.has(question.id));
+      const choice = choices[Math.floor(Math.random() * choices.length)];
+      usedIds.add(choice.id);
+      return choice;
+    }
+
+    function resetTest() {
+      const usedIds = new Set();
+      testQuestions = shuffled(testTypePlan).map(type => pickTestQuestion(type, '', usedIds));
+      testScores = Array(10).fill(null);
+      testLocked = Array(10).fill(false);
+      testRound = 1;
+      renderTest();
+    }
+
+    function renderTest() {
+      const container = document.getElementById('test-questions');
+      container.innerHTML = '';
+      testQuestions.forEach((question, index) => {
+        const card = document.createElement('div');
+        card.className = 'test-question';
+
+        const type = document.createElement('span');
+        type.className = 'test-type';
+        type.textContent = question.label;
+
+        const prompt = document.createElement('p');
+        prompt.innerHTML = `<strong>${index + 1}.</strong> ${question.source}`;
+
+        const starter = document.createElement('p');
+        starter.className = 'text-xs';
+        starter.textContent = question.starter;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Tik jou antwoord hier...';
+        input.autocomplete = 'off';
+        input.setAttribute('aria-label', `Toets my, vraag ${index + 1}`);
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'answer-check test-check';
+        button.textContent = 'Merk my';
+        button.setAttribute('aria-label', `Merk toetsvraag ${index + 1}`);
+        button.addEventListener('click', () => markTestAnswer(index, input, button, result));
+
+        const result = document.createElement('div');
+        result.className = 'test-result hidden';
+        result.setAttribute('aria-live', 'polite');
+
+        input.addEventListener('keydown', event => {
+          if (event.key === 'Enter') button.click();
+        });
+
+        card.append(type, prompt, starter, input, button, result);
+        container.appendChild(card);
+      });
+      updateTestScore();
+      document.getElementById('test-round-summary').classList.add('hidden');
+    }
+
+    function hasTokensInOrder(text, tokens) {
+      const words = text.split(' ');
+      let position = -1;
+      return tokens.every(token => {
+        position = words.indexOf(normalizeText(token), position + 1);
+        return position !== -1;
+      });
+    }
+
+    function scoreTestAnswer(question, value) {
+      const normalized = normalizeText(value);
+      if (!normalized) return null;
+      const fullAnswers = [question.answer, question.fragment].map(normalizeText);
+      if (fullAnswers.includes(normalized)) return 2;
+      return hasTokensInOrder(normalized, question.structure) ? 1 : 0;
+    }
+
+    function markTestAnswer(index, input, button, result) {
+      if (testLocked[index]) return;
+      const score = scoreTestAnswer(testQuestions[index], input.value);
+      if (score === null) {
+        input.classList.add('incorrect');
+        result.className = 'test-result zero';
+        result.textContent = 'Vul asseblief eers jou antwoord in.';
+        return;
+      }
+
+      testScores[index] = score;
+      testLocked[index] = true;
+      input.disabled = true;
+      button.disabled = true;
+      button.textContent = `${score} / 2`;
+      input.classList.add(score === 2 ? 'correct' : 'incorrect');
+
+      if (score === 2) {
+        button.classList.add('correct');
+        result.className = 'test-result full';
+        result.textContent = '✓ Heeltemal korrek!';
+      } else if (score === 1) {
+        button.classList.add('marked');
+        result.className = 'test-result partial';
+        result.textContent = '1/2 — Die struktuur is reg, maar die volledige sin kort nog aandag.';
+      } else {
+        button.classList.add('marked');
+        result.className = 'test-result zero';
+        result.textContent = '0/2 — Kyk weer na die tydsvorm en woordorde.';
+      }
+
+      updateTestScore();
+      if (testLocked.every(Boolean)) finishTestRound();
+    }
+
+    function updateTestScore() {
+      const score = testScores.reduce((sum, item) => sum + (item || 0), 0);
+      document.getElementById('test-score-badge').textContent = `${score} / 20`;
+    }
+
+    function finishTestRound() {
+      const score = testScores.reduce((sum, item) => sum + item, 0);
+      const summary = document.getElementById('test-round-summary');
+      const title = document.getElementById('test-round-title');
+      const message = document.getElementById('test-round-message');
+      const nextButton = document.getElementById('test-next-round');
+      title.textContent = `Rondte ${testRound}: ${score} / 20`;
+
+      if (score === 20) {
+        message.textContent = 'Uitstekend — jy het alles reg! Begin ’n nuwe gemengde toets wanneer jy gereed is.';
+        nextButton.textContent = 'Nuwe toets';
+        launchCelebration(40);
+      } else {
+        const retained = testScores.filter(item => item < 2).length;
+        message.textContent = `${retained} vraag${retained === 1 ? '' : 'e'} bly dieselfde. Alle 2/2-vrae kry in die volgende rondte nuwe sinne.`;
+        nextButton.textContent = 'Volgende rondte';
+      }
+      summary.classList.remove('hidden');
+      summary.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
+
+    function nextTestRound() {
+      const usedIds = new Set(testQuestions.filter((question, index) => testScores[index] < 2).map(question => question.id));
+      testQuestions = testQuestions.map((question, index) => {
+        if (testScores[index] < 2) return question;
+        return pickTestQuestion(question.type, question.id, usedIds);
+      });
+      testScores = Array(10).fill(null);
+      testLocked = Array(10).fill(false);
+      testRound += 1;
+      renderTest();
+      document.getElementById('section-test').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+
+    resetTest();
     updateNavigation();
   </script>
 </body>
